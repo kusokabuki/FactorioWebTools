@@ -156,5 +156,3 @@ class TrainApp extends React.Component {
         }
     }
 }
-
-ReactDOM.render(React.createElement(TrainApp, null), document.getElementById("app"));
