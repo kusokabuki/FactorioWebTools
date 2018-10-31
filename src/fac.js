@@ -38,68 +38,68 @@ class TrainApp extends React.Component {
     render() {
         const { maxSpeed, tick_reached_max, distance, weight } = this.calculate();
         return (
-            React.createElement("div", null, 
-                React.createElement("p", null, 
-                    React.createElement("label", null, "燃料："), 
-                    React.createElement("select", {
-                        value: this.state.fuel, 
-                        onChange: e => this.setState({ fuel: e.target.value })
-                    }, 
-                        this.fuels.map((f, i) => 
-                            React.createElement("option", {key: f.name, value: i}, f.name)
-                        )
-                    )
-                ), 
-                React.createElement("ul", null, 
-                this.vehicles.map((v, i) => 
-                    React.createElement("li", {key: v.id}, 
-                        React.createElement("label", null, v.name, "：", 
-                            React.createElement("input", {type: "number", min: v.min, value: this.state[v.id], 
-                                onChange: e => {
+            <div>
+                <p>
+                    <label>燃料：</label>
+                    <select
+                        value={this.state.fuel}
+                        onChange={e => this.setState({ fuel: e.target.value })}
+                    >
+                        {this.fuels.map((f, i) => 
+                            <option key={f.name} value={i}>{f.name}</option>
+                        )}
+                    </select>
+                </p>
+                <ul>
+                {this.vehicles.map((v, i) => 
+                    <li key={v.id}>
+                        <label>{v.name}：
+                            <input type='number' min={v.min} value={this.state[v.id]} 
+                                onChange={e => {
                                     const obj = {};
                                     obj[v.id] = Number.parseInt(e.target.value);
                                     this.setState(obj);
-                                }}
-                            )
-                        )
-                    )
-                )
-                ), 
-                React.createElement("p", null, 
-                    React.createElement("label", null, "先頭車両の種類："), 
-                    [0, 2, 3].map((i) =>
-                        React.createElement("span", {key: i}, 
-                            React.createElement("input", {type: "radio", value: i, checked: this.state.Leadertype === i, 
-                            onChange: e => this.setState({ Leadertype: i })}), this.vehicles[i].name
-                        )
-                    )
-                ), 
-                React.createElement("hr", null), 
-                React.createElement("table", null, 
-                    React.createElement("tbody", null, 
-                        React.createElement("tr", null, 
-                            React.createElement("th", null, "最高速度に到達する距離"), 
-                            React.createElement("td", null, distance, " m")
-                        ), 
-                        React.createElement("tr", null, 
-                            React.createElement("th", null, "レール換算"), 
-                            React.createElement("td", null,  Math.ceil(distance / 2), " 個")
-                        ), 
-                        React.createElement("tr", null, 
-                            React.createElement("th", null, "時間"), 
-                            React.createElement("td", null, tick_reached_max / 60, " 秒")
-                        ), 
-                        React.createElement("tr", null, 
-                            React.createElement("th", null, "最高速度"), 
-                            React.createElement("td", null, maxSpeed * 60 * 60 * 60 / 1000, " km/h")
-                        ), 
-                        React.createElement("tr", null, 
-                            React.createElement("th", null, "総重量"), 
-                            React.createElement("td", null, weight, " kg")
-                        )
-                    )
-                )
-            )            
+                                }} >
+                            </input>
+                        </label>
+                    </li>
+                )}
+                </ul>
+                <p>
+                    <label>先頭車両の種類：</label>
+                    {[0, 2, 3].map((i) =>
+                        <span key={i}>
+                            <input type="radio" value={i} checked={this.state.Leadertype === i}
+                            onChange={e => this.setState({ Leadertype: i })} />{this.vehicles[i].name}    
+                        </span>
+                    )}
+                </p>
+                <hr></hr>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>最高速度に到達する距離</th>
+                            <td>{distance} m</td>
+                        </tr>
+                        <tr>
+                            <th>レール換算</th>
+                            <td>{ Math.ceil(distance / 2)} 個</td>
+                        </tr>
+                        <tr>
+                            <th>時間</th>
+                            <td>{tick_reached_max / 60 } 秒</td>
+                        </tr>
+                        <tr>
+                            <th>最高速度</th>
+                            <td>{maxSpeed * 60 * 60 * 60 / 1000} km/h</td>
+                        </tr>
+                        <tr>
+                            <th>総重量</th>
+                            <td>{weight} kg</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>            
         );
     }
 
@@ -157,4 +157,4 @@ class TrainApp extends React.Component {
     }
 }
 
-ReactDOM.render(React.createElement(TrainApp, null), document.getElementById("app"));
+ReactDOM.render(<TrainApp />, document.getElementById("app"));
