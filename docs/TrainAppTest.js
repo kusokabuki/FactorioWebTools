@@ -7,9 +7,6 @@ class TrainAppTest extends React.Component {
             React.createElement("span", null, "test3 ", this.test3() ? "成功" : "失敗"), React.createElement("br", null), 
             React.createElement("span", null, "test4 ", this.test4() ? "成功" : "失敗"), React.createElement("br", null)
         ));
-        
-        
-        
     }
 
     test1(){
