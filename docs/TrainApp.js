@@ -36,7 +36,7 @@ class TrainApp extends React.Component {
     }
 
     render() {
-        const { maxSpeed, tick_reached_max, distance, weight } = this.calculate();
+        const { limitSpeed, maxSpeed, tick_reached_max, distance, weight } = this.calculate();
         return (
             React.createElement("div", null, 
                 React.createElement("p", null, 
@@ -90,8 +90,8 @@ class TrainApp extends React.Component {
                             React.createElement("td", null, tick_reached_max / 60, " 秒")
                         ), 
                         React.createElement("tr", null, 
-                            React.createElement("th", null, "最高速度"), 
-                            React.createElement("td", null, maxSpeed * 60 * 60 * 60 / 1000, " km/h")
+                            React.createElement("th", null, "最高速度 / 制限速度"), 
+                            React.createElement("td", null, maxSpeed * 60 * 60 * 60 / 1000, " / ", limitSpeed * 60 * 60 * 60 / 1000, " km/h")
                         ), 
                         React.createElement("tr", null, 
                             React.createElement("th", null, "総重量"), 
@@ -120,7 +120,7 @@ class TrainApp extends React.Component {
 
         // 燃料の加速ボーナスと最高速度
         const { acc_mult, top_speed_mult } = this.fuels[this.state.fuel];
-        const maxSpeed = 1.2 * top_speed_mult;
+        const limitSpeed = 1.2 * top_speed_mult;
 
         // 出発時から n tick目の速度を v(n)、
         // n tick目で空気抵抗なしで加速した場合の速度を v'(n)とすると
@@ -145,10 +145,21 @@ class TrainApp extends React.Component {
         const q = (power * acc_mult - friction) / weight * p;
         const v1 = power * acc_mult / weight * p;
         const a = q / (1 - p);
+
+        const x = (limitSpeed - a) / (v1 - a);
+        let maxSpeed = 0;
+
+        if (x < 0){
+            maxSpeed = a-0.0001;
+        } else {
+            maxSpeed = limitSpeed;
+        }
+
         const maxn = Math.log((maxSpeed - a) * p / (v1 - a)) / Math.log(p);
         const distance = (v1 - a) * (Math.pow(p, maxn) - 1) / (p - 1) + maxn * a;
 
         return {
+            limitSpeed: limitSpeed,
             maxSpeed: maxSpeed,
             tick_reached_max: maxn,
             distance: distance,

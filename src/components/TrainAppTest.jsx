@@ -1,3 +1,5 @@
+import React from 'react';
+
 class TrainAppTest extends React.Component {
     
     render(){

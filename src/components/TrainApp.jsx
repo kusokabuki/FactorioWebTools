@@ -1,4 +1,6 @@
-class TrainApp extends React.Component {
+import React from 'react';
+
+export default class TrainApp extends React.Component {
     constructor(props) {
         super(props)
         this.fuels = [
@@ -36,7 +38,7 @@ class TrainApp extends React.Component {
     }
 
     render() {
-        const { maxSpeed, tick_reached_max, distance, weight } = this.calculate();
+        //const { limitSpeed, maxSpeed, tick_reached_max, distance, weight } = this.calculate();
         return (
             <div>
                 <p>
@@ -75,30 +77,11 @@ class TrainApp extends React.Component {
                     )}
                 </p>
                 <hr></hr>
-                <table>
-                    <tbody>
-                        <tr>
-                            <th>最高速度に到達する距離</th>
-                            <td>{distance} m</td>
-                        </tr>
-                        <tr>
-                            <th>レール換算</th>
-                            <td>{ Math.ceil(distance / 2)} 個</td>
-                        </tr>
-                        <tr>
-                            <th>時間</th>
-                            <td>{tick_reached_max / 60 } 秒</td>
-                        </tr>
-                        <tr>
-                            <th>最高速度</th>
-                            <td>{maxSpeed * 60 * 60 * 60 / 1000} km/h</td>
-                        </tr>
-                        <tr>
-                            <th>総重量</th>
-                            <td>{weight} kg</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <CalcResult result={ this.calculate() }></CalcResult>
+                <span>
+                    ※注意：燃料の補充時に加速が鈍るため結果が一致しないことがあります。
+                </span>
+
             </div>            
         );
     }
@@ -120,7 +103,12 @@ class TrainApp extends React.Component {
 
         // 燃料の加速ボーナスと最高速度
         const { acc_mult, top_speed_mult } = this.fuels[this.state.fuel];
-        const maxSpeed = 1.2 * top_speed_mult;
+        const limitSpeed = 1.2 * top_speed_mult;
+
+        // パワーが足りない場合
+        if (power * acc_mult - friction <= 0) {
+            return NaN;
+        }
 
         // 出発時から n tick目の速度を v(n)、
         // n tick目で空気抵抗なしで加速した場合の速度を v'(n)とすると
@@ -144,15 +132,60 @@ class TrainApp extends React.Component {
         const p = (1 - airResistance / weight * 1000);
         const q = (power * acc_mult - friction) / weight * p;
         const v1 = power * acc_mult / weight * p;
-        const a = q / (1 - p);
+        const a = q / (1 - p); // 特性方程式(a は v(n+1) = v(n) のときの解)
+
+        let maxSpeed = Math.min(a-0.0000001, limitSpeed);
+
         const maxn = Math.log((maxSpeed - a) * p / (v1 - a)) / Math.log(p);
         const distance = (v1 - a) * (Math.pow(p, maxn) - 1) / (p - 1) + maxn * a;
 
         return {
+            limitSpeed: limitSpeed,
             maxSpeed: maxSpeed,
             tick_reached_max: maxn,
             distance: distance,
             weight: weight
         }
+    }
+}
+
+const CalcResult = (props) => {
+    
+    if (Number.isNaN(props.result)) {
+        return <div>この構成では列車は動きません.</div>
+    } else {
+        const { limitSpeed, maxSpeed, tick_reached_max, distance, weight} = props.result;
+        return (
+            <div>
+                <table>
+                    <tbody>                
+                        <tr>
+                            <th>最高速度</th>
+                            <td>{maxSpeed * 60 * 60 * 60 / 1000} km/h</td>
+                        </tr>
+                        <tr>
+                            <th>ゲーム内の制限速度</th>
+                            <td>{limitSpeed * 60 * 60 * 60 / 1000} km/h</td>
+                        </tr>
+                        <tr>
+                            <th>最高速度に到達する距離</th>
+                            <td>{distance} m</td>
+                        </tr>
+                        <tr>
+                            <th>レール換算</th>
+                            <td>{ Math.ceil(distance / 2)} 個</td>
+                        </tr>
+                        <tr>
+                            <th>時間</th>
+                            <td>{tick_reached_max / 60 } 秒</td>
+                        </tr>
+                        <tr>
+                            <th>総重量</th>
+                            <td>{weight} kg</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
     }
 }
