@@ -23,8 +23,8 @@ export default class TrainApp extends React.Component {
         ];
 
         this.state = {
-            fuel: 0,
-            breaking_bonus: 0,
+            fuel: 3,
+            breaking_bonus: 1.00,
             locomotive_active: 1,
             locomotive_inactive: 0,
             cargo_wagon: 0,
@@ -44,7 +44,6 @@ export default class TrainApp extends React.Component {
     }
 
     render() {
-        //const { limitSpeed, maxSpeed, tick_reached_max, distance, weight } = this.calculate();
         return (
             <div>
                 <p>
