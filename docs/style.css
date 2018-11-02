@@ -41,3 +41,8 @@ a:visited {
   color:#a687c1;
   text-decoration:underline;
 }
+
+img.vehicle{
+  margin-left: -4px;
+  width: 65px;
+}

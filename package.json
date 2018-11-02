@@ -9,6 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "debug": "webpack --config webpack.debug.config.js -d",
+    "watch": "webpack --config webpack.debug.config.js -d --watch",
     "webpack":"webpack -p"
   },
   "repository": {
