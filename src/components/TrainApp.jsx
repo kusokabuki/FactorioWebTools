@@ -139,11 +139,12 @@ const organizeTrain = (param) => {
         formation.push(VEHICLES[param.leader].img);
         varr[param.leader]--;
     }
-    for (let i = 0; i < varr.length; i++) {
+    [0,2,3,1].forEach(i => {
         for (let j = 0; j < varr[i]; j++) {
             formation.push(VEHICLES[i].img);
         }
-    }
+    });
+        
     return formation.reverse();
 }
 
