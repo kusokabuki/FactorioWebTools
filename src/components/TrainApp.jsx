@@ -45,7 +45,6 @@ export default class TrainApp extends React.Component {
 
     render() {
         const param = this.accumulateParams();
-
         return (
             <div>
                 <p>
