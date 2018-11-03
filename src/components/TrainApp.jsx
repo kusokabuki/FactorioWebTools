@@ -5,6 +5,7 @@ import TrainInputForm from './TrainInputForm.jsx';
 import StatusView from './TrainStatusView.jsx';
 import ResultView from './ResultView.jsx';
 import GraphView from './GraphView.jsx';
+import ETACalcForm from './ETACalcForm.jsx';
 
 import Train from './Train';
 
@@ -20,10 +21,13 @@ export default class TrainApp extends React.Component {
             cargo_wagon: 0,
             artillery_wagon: 0,
             leader: 0 // 先頭車両の種類
-        }
-
+        }        
         this.train = new Train();
         this.handleChangeInput = this.handleChangeInput.bind(this);
+    }
+
+    componentDidMount(){
+        
     }
 
     render() {
@@ -35,7 +39,12 @@ export default class TrainApp extends React.Component {
                 <hr />
                 <StatusView train={this.train} />
                 <ResultView result={result} />
-                {this.train.CanMove ? <GraphView data={result.graphData} maxspd_distance={result.maxspd_distance + result.maxspd_braking} /> : <span />}                
+                
+                {this.train.CanMove ? (
+                    <div>
+                        <GraphView data={result.graphData} maxspd_distance={result.maxspd_distance + result.maxspd_braking} />
+                        <ETACalcForm train={this.train} />
+                    </div>) : null}                
             </div>
         );
     }

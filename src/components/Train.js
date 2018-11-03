@@ -169,4 +169,32 @@ export default class Train {
     calcCruiseDistance(spd, n) {
         return spd * n;
     }
+
+    calcEta(distance) {
+        const p = (1 - this.airResistance / this.weight * 1000);
+        const v1 = this.power / this.weight * p;
+        const q = v1 - this.friction / this.weight * p;
+        const a = q / (1 - p);
+        const ba = (this.braking + this.friction) / this.weight;
+
+        // 時速の小数点２桁までで表示されない大きさの数値
+        const err = 0.001 * 1000 / 60 / 60 / 60;
+
+        // 特性方程式の解(a)は到達可能な最高速度　a をそのまま使うとｎが求まらないので少し小さい値にする
+        const maxspd = Math.min(a - err, this.limitSpeed);
+
+        const maxspd_tick = Math.ceil(this.calcAccelerationTick(maxspd, p, v1, a));
+        const maxspd_distance = this.calcAccelerationDistance(maxspd_tick, p, v1, a);
+        const braking_tick = this.calcBrakingTick(maxspd, ba);
+        const braking_distance = this.calcBrakingDistance(maxspd, ba);
+        const limit = maxspd_distance + braking_distance;
+
+        if (distance < limit) {
+            return NaN;
+        }
+
+        const cruise_tick = (distance - limit) / maxspd;
+
+        return this.tick2Seconds(maxspd_tick + cruise_tick + braking_tick);
+    }
 }
