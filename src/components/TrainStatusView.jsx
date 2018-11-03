@@ -4,13 +4,15 @@ import defs from '../defines';
 const gameSpeed2kmph = (spd) => spd * 60 * 60 * 60 / 1000;
 
 // 列車を編成する
-const organizeTrain = (train, vehicles) => {
+const organizeTrain = (train) => {
     const varr = train.vehicles.concat();
     const formation = [];
+
     if (varr[train.leader] != 0) {
         formation.push(defs.vehicles[train.leader].img);
         varr[train.leader]--;
     }
+
     [0,2,3,1].forEach(i => {
         for (let j = 0; j < varr[i]; j++) {
             formation.push(defs.vehicles[i].img);
@@ -19,12 +21,13 @@ const organizeTrain = (train, vehicles) => {
         
     return formation.reverse();
 }
+
 export default (props) => {    
     const train = props.train;
     const formation = organizeTrain(train);
 
     return (
-        <div>
+        <div className="statusView">
             <h2>列車パラメータ</h2>
             <div>
                 {formation.map((f, i) => <img className="vehicle" key={f + i} src={"img/" + f} />)}
@@ -46,7 +49,7 @@ export default (props) => {
                         <td>{train.weight} kg</td>
                         <td>{train.power}</td>
                         <td>{train.friction}</td>
-                        <td>{train.breaking}</td>
+                        <td>{train.braking}</td>
                         <td>{train.airResistance}</td>
                     </tr>
                 </tbody>

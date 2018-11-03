@@ -7,7 +7,7 @@ export default (props) => {
             <label>燃料：</label>
             <select 
                 value={props.state.fuel}
-                onChange={e => props.changeHandler("fuel", e.target.value)}
+                onChange={e => props.onChange("fuel", e.target.value)}
             >
                 {defs.fuels.map((f, i) =>
                     <option key={f.name} value={i}>{f.name}</option>
@@ -19,7 +19,7 @@ export default (props) => {
             <select
                 value={props.state.breaking_bonus}
                 onChange={e => 
-                    props.changeHandler("breaking_bonus", Number.parseFloat(e.target.value))
+                    props.onChange("breaking_bonus", Number.parseFloat(e.target.value))
                 }
             >
                 {defs.breaking_bonuses.map((f, i) =>
@@ -35,7 +35,7 @@ export default (props) => {
                             type='number' 
                             min={v.min} 
                             value={props.state[v.id]}
-                            onChange={e => props.changeHandler(v.id, Number.parseInt(e.target.value))} >
+                            onChange={e => props.onChange(v.id, Number.parseInt(e.target.value))} >
                         </input>
                     </label>
                 </li>
@@ -46,7 +46,7 @@ export default (props) => {
             {defs.vehicles.map((v, i) =>
                 <span key={i}>
                     <input id={"rd"+i} type="radio" value={i} checked={props.state.leader === i}
-                        onChange={e => props.changeHandler("leader", i)} />
+                        onChange={e => props.onChange("leader", i)} />
                     <label htmlFor={"rd"+i}>{v.name}</label>
                 </span>
             )}

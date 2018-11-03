@@ -22,9 +22,24 @@ h2 {
   margin-bottom: 15px;
 }
 
-th, td {
+.statusView table,
+.resultView table
+{
+  border-collapse: collapse;
+}
+
+.statusView th, 
+.resultView th{
+  border: 1px solid gray;
+  padding: 5px;
+}
+
+.statusView td,
+.resultView td
+{
     border: 1px solid gray;
     padding: 5px;
+    text-align: center;
 }
 
 a {
@@ -45,4 +60,57 @@ a:visited {
 img.vehicle{
   margin-left: -4px;
   width: 65px;
+}
+
+.graphView {
+  padding: 50px 10px 100px 10px;
+}
+
+.tooltip{
+  opacity: 0.9;
+  background: #fff;
+  border-radius: 4px;
+  padding: 5px;
+  font-size: smaller;
+}
+
+.tooltip table {
+  border-collapse: collapse;
+}
+
+.tooltip th, .tooltip td {
+  padding: 3px 5px;
+}
+
+.tooltip tbody tr {
+  border-top: 1px solid gray;
+  border-bottom: 1px solid gray;
+}
+
+.tooltip th{
+  border: 0px;  
+}
+
+.tooltip td{
+  text-align: right;
+}
+
+.tooltip tr th:first-child{
+  border-right: 1px solid gray;  
+}
+
+.tooltip tfoot {
+  border-top: 2px solid gray;
+}
+
+.tooltip .acceleration{
+  color: #8884d8;
+}
+
+.tooltip .cruise {
+  color: #82ca9d;
+}
+
+.tooltip .brake {
+  color: #ffc658;
 }
