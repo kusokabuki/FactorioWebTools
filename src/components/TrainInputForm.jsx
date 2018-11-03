@@ -17,12 +17,12 @@ export default (props) => {
         <p>
             <label>制動力ボーナス：</label>
             <select
-                value={props.state.breaking_bonus}
+                value={props.state.braking_bonus}
                 onChange={e => 
-                    props.onChange("breaking_bonus", Number.parseFloat(e.target.value))
+                    props.onChange("braking_bonus", Number.parseFloat(e.target.value))
                 }
             >
-                {defs.breaking_bonuses.map((f, i) =>
+                {defs.braking_bonuses.map((f, i) =>
                     <option key={f} value={f}>{Math.round(f * 100)} %</option>
                 )}
             </select>

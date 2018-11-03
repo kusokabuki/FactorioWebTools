@@ -6,7 +6,7 @@ export default {
         { name: "核燃料", acc_mult: 2.5, top_speed_mult: 1.15, mg: "nuclear-fuel.png" },
     ],
     
-    breaking_bonuses : [
+    braking_bonuses : [
         0, 0.1, 0.25, 0.40, 0.55, 0.70, 0.85, 1.00
     ],
     

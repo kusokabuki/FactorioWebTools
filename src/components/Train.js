@@ -77,7 +77,7 @@ export default class Train {
         // 特性方程式の解(a)は到達可能な最高速度　a をそのまま使うとｎが求まらないので少し小さい値にする
         const maxspd = Math.min(a - err, this.limitSpeed);
 
-        const maxspd_tick = this.calcAccelerationTick(maxspd, p, v1, a);
+        const maxspd_tick = Math.ceil(this.calcAccelerationTick(maxspd, p, v1, a));
         const maxspd_distance = this.calcAccelerationDistance(maxspd_tick, p, v1, a);
         const maxspd_braking = this.calcBrakingDistance(maxspd, ba);
         const data = this.buildGraphData(p, v1, a, ba, maxspd, maxspd_tick, maxspd_distance, maxspd_braking);
@@ -89,8 +89,8 @@ export default class Train {
         const data = [];
         let datapoints = 20;
         // 加速中のデータ
-        for (let i = 0; i <= datapoints; i++) {
-            const t = Math.floor(i * (mtick / datapoints));
+        for (let i = 0; i < datapoints; i++) {
+            const t = Math.floor((i+1) * (mtick / datapoints));
             const spd = this.calcSpeed(t, p, v1, a);
             const ad = this.calcAccelerationDistance(t, p, v1, a)
             const bd = this.calcBrakingDistance(spd, ba);
@@ -153,7 +153,7 @@ export default class Train {
 
     // 速度spd から停止までの移動距離を計算する
     calcBrakingDistance(spd, ba) {
-        return Math.max(spd / ba / 2, 1.1) * spd + 2;
+        return Math.max(spd / ba / 2, 1.1) * spd;
     }
 
     // 速度spd から停止までのtick数を計算する
