@@ -92,17 +92,18 @@ export default class Train {
         for (let i = 0; i <= datapoints; i++) {
             const t = Math.floor(i * (mtick / datapoints));
             const spd = this.calcSpeed(t, p, v1, a);
-            const d = this.calcAccelerationDistance(t, p, v1, a) + this.calcBrakingDistance(spd, ba);
-            const b = this.calcBrakingTick(spd, ba);
+            const ad = this.calcAccelerationDistance(t, p, v1, a)
+            const bd = this.calcBrakingDistance(spd, ba);
+            const bt = this.calcBrakingTick(spd, ba);
             data[i] = {
-                ttl_dis: d,
-                ttl_sec: this.tick2Seconds(t + b),
+                ttl_dis: ad + bd,
+                ttl_sec: this.tick2Seconds(t + bt),
                 acc_sec: this.tick2Seconds(t),
                 cru_sec: 0,
-                brk_sec: this.tick2Seconds(b),
-                acc_dis: d,
+                brk_sec: this.tick2Seconds(bt),
+                acc_dis: ad,
                 cru_dis: 0,
-                brk_dis: b,
+                brk_dis: bd,
                 maxspd: this.gameSpd2kmph(spd)
             }
         }
