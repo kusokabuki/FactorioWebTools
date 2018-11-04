@@ -42,6 +42,10 @@ h2 {
     text-align: center;
 }
 
+.warning {
+  color:#aa2;
+}
+
 a {
   color:#4488EE;
   text-decoration:underline;
@@ -63,7 +67,7 @@ img.vehicle{
 }
 
 .graphView {
-  padding: 50px 10px 100px 10px;
+  padding: 0px;
 }
 
 .tooltip{

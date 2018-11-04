@@ -62,11 +62,11 @@ const CustomTooltip = (props) =>{
 }
 
 const renderDistancebaseGraph = (props) => {
-    const {data, maxspd_distance} = props;
+    const {train} = props;
     return (
         <div className="graphView">
             <h2>グラフ（データ検証中）</h2>
-            <AreaChart width={600} height={400} margin={{bottom:20, left:15}} data={data} >
+            <AreaChart width={600} height={400} margin={{bottom:20, left:15}} data={train.GraphData} >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="ttl_dis" name="距離" unit="m" type="number" scale="linear" tickFormatter={v=>v.toFixed(2)} >
                     <Label value="運行距離 [m]" position="insideBottom" offset={-15}/>
@@ -79,7 +79,7 @@ const renderDistancebaseGraph = (props) => {
                 <Area dataKey='acc_sec' stackId="1" name="加速区間" unit="秒" stroke='#8884d8' fill='#8884d8' />
                 <Area dataKey='brk_sec' stackId="1" name="減速区間" unit="秒" stroke='#ffc658' fill='#ffc658' />
                 <Area dataKey='cru_sec' stackId="1" name="巡航区間" unit="秒" stroke='#82ca9d' fill='#82ca9d' />
-                <ReferenceLine x={maxspd_distance}  stroke="red" />
+                <ReferenceLine x={train.maxspd_total_distance}  stroke="red" />
             </AreaChart>
         </div>
     );

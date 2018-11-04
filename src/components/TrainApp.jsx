@@ -2,6 +2,7 @@ import React from 'react';
 import defs from '../defines';
 
 import TrainInputForm from './TrainInputForm.jsx';
+import TrainFormationView from './TrainFormationView.jsx';
 import StatusView from './TrainStatusView.jsx';
 import ResultView from './ResultView.jsx';
 import GraphView from './GraphView.jsx';
@@ -26,23 +27,19 @@ export default class TrainApp extends React.Component {
         this.handleChangeInput = this.handleChangeInput.bind(this);
     }
 
-    componentDidMount(){
-        
-    }
-
     render() {
-        this.train.update(this.state);
-        const result = this.train.calc();
+        this.train.setState(this.state);
         return (
             <div>
                 <TrainInputForm state={this.state} onChange={this.handleChangeInput} />
                 <hr />
+                <TrainFormationView train={this.train} />
                 <StatusView train={this.train} />
-                <ResultView result={result} />
+                <ResultView train={this.train} />
                 
                 {this.train.CanMove ? (
                     <div>
-                        <GraphView data={result.graphData} maxspd_distance={result.maxspd_distance + result.maxspd_braking} />
+                        <GraphView train={this.train}/>
                         <ETACalcForm train={this.train} />
                     </div>) : null}                
             </div>
