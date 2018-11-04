@@ -13,14 +13,63 @@ body {
   color: #20262E;
 }
 
-li {
-  margin: 8px 0;
-}
-
 h2 {
   font-weight: bold;
   margin-bottom: 15px;
 }
+
+.inputForm {
+  margin: 10px;
+}
+
+.inputForm ul {
+  padding-left: 20px;
+}
+
+.inputForm li {
+  list-style: none;
+  margin: 5px;
+}
+
+.inputForm label {
+  margin-right: 10px;
+  width:130px;
+  display: inline-block;
+}
+
+.inputForm label.lbl_leader {
+  display: inline;
+}
+
+
+.formationView{
+  margin: 10px;
+}
+
+.statusView {
+  float: left;  
+  margin: 10px;
+}
+
+.resultView {
+  float: left;
+  margin: 10px;
+}
+
+.graphView {  
+  margin: 10px;
+  float: left;
+}
+
+.etaForm {
+  margin: 10px;
+  float: left;
+}
+
+.clear {
+  clear: both;  
+}
+
 
 .statusView table,
 .resultView table
@@ -64,10 +113,6 @@ a:visited {
 img.vehicle{
   margin-left: -4px;
   width: 65px;
-}
-
-.graphView {
-  padding: 0px;
 }
 
 .tooltip{

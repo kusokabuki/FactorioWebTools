@@ -16,7 +16,7 @@ export default class ETACalcForm extends React.Component {
     render() {
         const eta = this.props.train.calcEta(this.state.distance);
         return (
-            <div>
+            <div className="etaForm">
                 <h2>運行時間計算</h2>
                 <p>
                 <label> 駅間の距離：

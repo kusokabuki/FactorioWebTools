@@ -7,11 +7,11 @@ export default (props) => {
     const length = varr.reduce((c, v) => c + v);
 
     if (50 < length) {
-        return (<span>超長い車列</span>)
+        return (<div className="formationView">めっちゃ長い車列</div>)
     }
 
     const formation = [];
-    formation.push(<img src="img/goto-icon.png" />);
+    formation.push(<img src="img/goto-icon.png" key="arrow" />);
     if (varr[train.leader] != 0) {
         varr[train.leader]--;
         formation.push(<img className="vehicle" key="leader" src={"img/"+defs.vehicles[train.leader].img} />);
@@ -23,5 +23,5 @@ export default (props) => {
         }
     });
     
-    return formation.reverse();
+    return (<div className="formationView">{formation.reverse()}</div>);
 }

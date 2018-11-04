@@ -26,7 +26,7 @@ export default (props) => {
                         <tr>                            
                             <td>{r.spd.toFixed(4)} km/h</td>
                             <td>{r.dis.toFixed(4)} m</td>
-                            <td>{r.sec.toFixed(4)} 秒</td>
+                            <td>{r.sec.toFixed(4)} s</td>
                             <td>{r.brk.toFixed(4)} m</td>
                         </tr>
                     </tbody>
