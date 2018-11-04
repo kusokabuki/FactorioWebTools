@@ -25,7 +25,6 @@ export default class ETACalcForm extends React.Component {
                     <input
                         value={this.state.distance}
                         onChange={this.handleChange}
-                        min={2}
                         type="number" /> m
 
                 </p>
