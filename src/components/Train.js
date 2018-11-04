@@ -145,11 +145,12 @@ export default class Train {
 
     // 距離distanceの運行時間を計算する
     calcEta(distance) {
-        if (Number.isNaN(distance)) {
-            return NaN;
+        if (Number.isNaN(distance) || distance < 0) {
+                return NaN;
         } else if (distance < this.maxspd_total_distance) {
             // 減速距離=運行距離/2と仮定して最高速度を見積もる
-            const spd_estimate = Math.sqrt(this.ba * distance)
+            const spd_estimate = Math.min(this.maxspd, Math.sqrt(this.ba * distance));
+            
             let acc_tick = Math.ceil(this.calcAccelerationTick(spd_estimate));
             let cur = this.calcRunningFromAccTick(acc_tick);
             let next = this.calcRunningFromAccTick(acc_tick + 1);
@@ -163,6 +164,7 @@ export default class Train {
                     cur = this.calcRunningFromAccTick(--acc_tick);
                 }
                 try_count++;
+                if(30 < try_count) break;
             }
             const fc = this.calcFuelConsumed(next.acc_tick);
             return {
