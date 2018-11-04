@@ -30,7 +30,7 @@ export default class Train {
         this.fuel = 0;
         this.leader = 0;
         this.airResistance = 0;
-        this.limitSpeed = 0;        
+        this.limitSpeed = 0;
 
         this.graphData = null;
     }
@@ -41,10 +41,10 @@ export default class Train {
 
     get MaxSpeedInfo() {
         return {
-            spd:this.gameSpd2kmph(this.maxspd),
-            dis:this.maxspd_distance,
-            sec:this.tick2Seconds(this.maxspd_tick),
-            brk:this.maxspd_braking_distance
+            spd: this.gameSpd2kmph(this.maxspd),
+            dis: this.maxspd_distance,
+            sec: this.tick2Seconds(this.maxspd_tick),
+            brk: this.maxspd_braking_distance
         }
     }
 
@@ -55,7 +55,7 @@ export default class Train {
         return this.graphData;
     }
 
-    setState(state){
+    setState(state) {
         this.fuel = defs.fuels[state.fuel];
         this.leader = state.leader;
 
@@ -106,7 +106,7 @@ export default class Train {
         const datapoints = 20;
         // 加速中のデータ
         for (let i = 0; i < datapoints; i++) {
-            const t = Math.floor((i+1) * (this.maxspd_tick / datapoints));
+            const t = Math.floor((i + 1) * (this.maxspd_tick / datapoints));
             const spd = this.calcSpeed(t);
             const ad = this.calcAccelerationDistance(t)
             const bd = this.calcBrakingDistance(spd);
@@ -145,8 +145,36 @@ export default class Train {
 
     // 距離distanceの運行時間を計算する
     calcEta(distance) {
-        if (Number.isNaN(distance) || distance < this.maxspd_total_distance) {
+        if (Number.isNaN(distance)) {
             return NaN;
+        } else if (distance < this.maxspd_total_distance) {
+            // 減速距離=運行距離/2と仮定して最高速度を見積もる
+            const spd_estimate = Math.sqrt(this.ba * distance)
+            let acc_tick = Math.ceil(this.calcAccelerationTick(spd_estimate));
+            let cur = this.calcRunningFromAccTick(acc_tick);
+            let next = this.calcRunningFromAccTick(acc_tick + 1);
+            let try_count = 1;
+            while(!(cur.dis < distance && distance <= next.dis)){
+                if (next.dis < distance){
+                    cur = next;
+                    next = this.calcRunningFromAccTick(++acc_tick)
+                } else {
+                    next = cur;
+                    cur = this.calcRunningFromAccTick(--acc_tick);
+                }
+                try_count++;
+            }
+            const fc = this.calcFuelConsumed(next.acc_tick);
+            return {
+                ttl_sec: this.tick2Seconds(next.acc_tick + next.brk_tick),
+                acc_sec: this.tick2Seconds(next.acc_tick),
+                cru_sec: 0,
+                brk_sec: this.tick2Seconds(next.brk_tick),
+                maxspd: this.gameSpd2kmph(this.calcSpeed(next.acc_tick)),
+                fuel_consumed_joule: fc,
+                fuel_consumed_rate: fc / this.fuel.fuel_value,
+                try_count
+            }
         } else {
             const t = this.maxspd_tick;
             const ct = (distance - this.maxspd_total_distance) / this.maxspd;
@@ -156,12 +184,13 @@ export default class Train {
                 ttl_sec: this.tick2Seconds(t + bt + ct),
                 acc_sec: this.tick2Seconds(t),
                 cru_sec: this.tick2Seconds(ct),
-                brk_sec: this.tick2Seconds(bt),                
+                brk_sec: this.tick2Seconds(bt),
                 maxspd: this.gameSpd2kmph(this.maxspd),
                 fuel_consumed_joule: fc,
-                fuel_consumed_rate: fc / this.fuel.fuel_value
+                fuel_consumed_rate: fc / this.fuel.fuel_value,
+                try_count:0
             }
-        }        
+        }
     }
 
     tick2Seconds(tick) {
@@ -202,6 +231,16 @@ export default class Train {
     // エンジン稼働時間から燃料消費量を求める
     calcFuelConsumed(tick) {
         return defs.locomotive_power_watt * tick / 60;
+    }
+
+    // 加速時間から走行距離と時間を計算する
+    calcRunningFromAccTick(acc_tick) {
+        const spd = this.calcSpeed(acc_tick);
+        const ad = this.calcAccelerationDistance(acc_tick)
+        const bd = this.calcBrakingDistance(spd);
+        const bt = this.calcBrakingTick(spd);
+        
+        return { dis: ad + bd, acc_tick, brk_tick: bt };
     }
 
 }
