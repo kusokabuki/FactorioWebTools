@@ -148,31 +148,34 @@ export default class Train {
         if (Number.isNaN(distance) || distance < 0) {
                 return NaN;
         } else if (distance < this.maxspd_total_distance) {
-            // 減速距離=運行距離/2と仮定して最高速度を見積もる
-            const spd_estimate = Math.min(this.maxspd, Math.sqrt(this.ba * distance));
-            
-            let acc_tick = Math.ceil(this.calcAccelerationTick(spd_estimate));
-            let cur = this.calcRunningFromAccTick(acc_tick);
-            let next = this.calcRunningFromAccTick(acc_tick + 1);
+            let left = 0;
+            let right = this.maxspd_tick + Math.ceil(this.calcBrakingTick(this.maxspd));
             let try_count = 1;
-            while(!(cur.dis < distance && distance <= next.dis)){
-                if (next.dis < distance){
-                    cur = next;
-                    next = this.calcRunningFromAccTick(++acc_tick)
+            let result = null;
+            while(left <= right){
+                let mid = Math.floor((left + right) / 2);
+                let v = this.calcRunningFromAccTick(mid);
+                let v2 =  this.calcRunningFromAccTick(mid + 1);
+
+                if (v.dis < distance && distance < v2.dis) {
+                    result = v2;
+                    break;
+                }
+                if (v2.dis < distance){
+                    left = mid + 1;
                 } else {
-                    next = cur;
-                    cur = this.calcRunningFromAccTick(--acc_tick);
+                    right = mid - 1;
                 }
                 try_count++;
                 if(30 < try_count) break;
             }
-            const fc = this.calcFuelConsumed(next.acc_tick);
+            const fc = this.calcFuelConsumed(result.acc_tick);
             return {
-                ttl_sec: this.tick2Seconds(next.acc_tick + next.brk_tick),
-                acc_sec: this.tick2Seconds(next.acc_tick),
+                ttl_sec: this.tick2Seconds(result.acc_tick + result.brk_tick),
+                acc_sec: this.tick2Seconds(result.acc_tick),
                 cru_sec: 0,
-                brk_sec: this.tick2Seconds(next.brk_tick),
-                maxspd: this.gameSpd2kmph(this.calcSpeed(next.acc_tick)),
+                brk_sec: this.tick2Seconds(result.brk_tick),
+                maxspd: this.gameSpd2kmph(this.calcSpeed(result.acc_tick)),
                 fuel_consumed_joule: fc,
                 fuel_consumed_rate: fc / this.fuel.fuel_value,
                 try_count
