@@ -35,13 +35,18 @@ export default class TrainApp extends React.Component {
                 <hr />
                 <TrainFormationView train={this.train} />
                 <StatusView train={this.train} />
-                <ResultView train={this.train} />
-                <hr className="clear"/>
+                
                 {this.train.CanMove ? (
-                    <>
-                        <GraphView train={this.train}/>
-                        <ETACalcForm train={this.train} />
-                    </>) : null}   
+                <>
+                    <ResultView train={this.train} />
+                    <hr className="clear"/>
+                    <GraphView train={this.train}/>
+                    <ETACalcForm train={this.train} />
+                </>) : (
+                    <div className="warning clear">
+                        <h2>この構成では列車が動きません。</h2>
+                    </div>
+                )}   
                     <hr className="clear"/>             
             </div>
         );

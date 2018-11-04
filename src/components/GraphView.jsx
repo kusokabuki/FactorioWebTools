@@ -3,7 +3,6 @@ import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Label, Legend, Re
 
 const renderLegend = (props) => {
     const { payload } = props;
-  
     return (
       <ul>
         {

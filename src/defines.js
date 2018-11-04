@@ -1,9 +1,10 @@
 export default {
+    locomotive_power_watt : 600000,
     fuels : [
-        { name: "石炭", acc_mult: 1, top_speed_mult: 1, img: "coal.png" },
-        { name: "固形燃料", acc_mult: 1.2, top_speed_mult: 1.05, img: "solid-fuel.png" },
-        { name: "ロケット燃料", acc_mult: 1.8, top_speed_mult: 1.15, img: "rocket-fuel.png" },
-        { name: "核燃料", acc_mult: 2.5, top_speed_mult: 1.15, mg: "nuclear-fuel.png" },
+        { name: "石炭", acc_mult: 1, top_speed_mult: 1, img: "coal.png", fuel_value:8000000 },
+        { name: "固形燃料", acc_mult: 1.2, top_speed_mult: 1.05, img: "solid-fuel.png", fuel_value:25000000 },
+        { name: "ロケット燃料", acc_mult: 1.8, top_speed_mult: 1.15, img: "rocket-fuel.png", fuel_value:225000000 },
+        { name: "核燃料", acc_mult: 2.5, top_speed_mult: 1.15, img: "nuclear-fuel.png", fuel_value:1210000000 },
     ],
     
     braking_bonuses : [

@@ -65,7 +65,8 @@ export default class Train {
         this.braking = 0;
 
         defs.vehicles.forEach((v, i) => {
-            const n = state[v.id];
+            let n = state[v.id];
+            if (Number.isNaN(n)) n = 0;
             this.vehicles[i] = n;
             this.weight += v.weight * n;
             this.friction += v.friction_force * n;
@@ -144,11 +145,22 @@ export default class Train {
 
     // 距離distanceの運行時間を計算する
     calcEta(distance) {
-        if (distance < this.maxspd_total_distance) {
+        if (Number.isNaN(distance) || distance < this.maxspd_total_distance) {
             return NaN;
         } else {
-            const cruise_tick = (distance - this.maxspd_total_distance) / this.maxspd;
-            return this.tick2Seconds(this.maxspd_tick + cruise_tick + this.calcBrakingTick(this.maxspd));
+            const t = this.maxspd_tick;
+            const ct = (distance - this.maxspd_total_distance) / this.maxspd;
+            const bt = this.calcBrakingTick(this.maxspd);
+            const fc = this.calcFuelConsumed(t + ct);
+            return {
+                ttl_sec: this.tick2Seconds(t + bt + ct),
+                acc_sec: this.tick2Seconds(t),
+                cru_sec: this.tick2Seconds(ct),
+                brk_sec: this.tick2Seconds(bt),                
+                maxspd: this.gameSpd2kmph(this.maxspd),
+                fuel_consumed_joule: fc,
+                fuel_consumed_rate: fc / this.fuel.fuel_value
+            }
         }        
     }
 
@@ -185,6 +197,11 @@ export default class Train {
     // 停止状態から n tick 間加速し続けた場合の速度
     calcSpeed(tick) {
         return Math.min((this.v1 - this.a) * Math.pow(this.p, (tick - 1)) + this.a, this.limitSpeed);
+    }
+
+    // エンジン稼働時間から燃料消費量を求める
+    calcFuelConsumed(tick) {
+        return defs.locomotive_power_watt * tick / 60;
     }
 
 }
