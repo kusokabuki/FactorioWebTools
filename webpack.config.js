@@ -3,13 +3,16 @@ var webpack = require("webpack");
 
 module.exports = {
     mode: "production",
-    entry: "./src/main.jsx",
+    entry: {
+        "app": "./src/main.jsx",
+        "test/app": "./src/test.jsx"
+    },
     output: {
         path: path.join(__dirname, 'docs'),
-        filename: 'bundle.js'
+        filename: '[name].bundle.js'
     },
-    module:{
-        rules:[
+    module: {
+        rules: [
             {
                 test: /\.jsx?$/,
                 loader: "babel-loader",
