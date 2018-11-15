@@ -20,12 +20,12 @@ export default class ETACalcForm extends React.Component {
         return (
             <div className="etaForm">
                 <h2>運行時間計算</h2>
-                <span>最高速度到達距離より短い場合の計算は作成中</span>
                 <p>
                     <label> 駅間の距離：</label>
                     <input
                         value={this.state.distance}
                         onChange={this.handleChange}
+                        min={2}
                         type="number" /> m
 
                 </p>
@@ -38,10 +38,8 @@ export default class ETACalcForm extends React.Component {
                         {(eta.fuel_consumed_joule / 1000).toFixed(2) + " KJ"}<br />
                         <img src={"img/" + train.fuel.img} alt={train.fuel.name} width={20} height={20} />
                                 {eta.fuel_consumed_rate.toFixed(2)} 個分
-                    
                     </dd>
-
-                </dl> : <span>{train.maxspd_total_distance.toFixed(2)} m以上を指定してください。</span>
+                </dl> : <span>X</span>
                 }
                 
                     
