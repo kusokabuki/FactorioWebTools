@@ -1,5 +1,4 @@
 import defs from '../defines';
-import Spline from './spline';
 
 // Factorioの列車は動力による加速は現在の速度によらず一定で、空気抵抗は速度に比例して大きくなるようである。
 // 出発時から n tick目の速度を v(n)、加速を accとすると
@@ -33,7 +32,6 @@ export default class Train {
         this.airResistance = 0;
         this.limitSpeed = 0;
 
-        this.spline = new Spline();
         this.graphData = null;
     }
 
@@ -105,8 +103,8 @@ export default class Train {
 
     buildGraphData() {
         const data = [];
-        const sparr = [];
         const datapoints = 20;
+
         // 加速中のデータ
         for (let i = 0; i < datapoints; i++) {
             const t = Math.floor((i + 1) * (this.maxspd_tick / datapoints));
@@ -125,9 +123,7 @@ export default class Train {
                 brk_dis: bd,
                 maxspd: this.gameSpd2kmph(spd)
             }
-            sparr[i] = t + bt;
         }
-        this.spline.init(sparr);
 
         // 最高速度に到達後のデータ
         // 加速区間と減速区間は一定なので、最高速度での走行距離と時間を求めれば良い
@@ -151,55 +147,51 @@ export default class Train {
     // 距離distanceの運行時間を計算する
     calcEta(distance) {
         if (Number.isNaN(distance) || distance < 0) {
-                return NaN;
+            return NaN;
         } else if (distance < this.maxspd_total_distance) {
             let left = 0;
-            let right = this.maxspd_tick + Math.ceil(this.calcBrakingTick(this.maxspd));
+            let right = this.maxspd_tick;
             let try_count = 1;
             let result = null;
-            while(left <= right){
+            while (left <= right) {
                 let mid = Math.floor((left + right) / 2);
                 let v = this.calcRunningFromAccTick(mid);
-                let v2 =  this.calcRunningFromAccTick(mid + 1);
+                let v2 = this.calcRunningFromAccTick(mid + 1);
 
-                if (v.dis < distance && distance < v2.dis) {
+                if (v.dis < distance && distance <= v2.dis) {
                     result = v2;
                     break;
                 }
-                if (v2.dis < distance){
+                if (v2.dis < distance) {
                     left = mid + 1;
                 } else {
                     right = mid - 1;
                 }
                 try_count++;
-                if(30 < try_count) break;
+                if (30 < try_count) break;
             }
             const fc = this.calcFuelConsumed(result.acc_tick);
-            return {
-                ttl_sec: this.tick2Seconds(result.acc_tick + result.brk_tick),
-                acc_sec: this.tick2Seconds(result.acc_tick),
-                cru_sec: 0,
-                brk_sec: this.tick2Seconds(result.brk_tick),
-                maxspd: this.gameSpd2kmph(this.calcSpeed(result.acc_tick)),
-                fuel_consumed_joule: fc,
-                fuel_consumed_rate: fc / this.fuel.fuel_value,
-                try_count
-            }
+            const spd = this.calcSpeed(result.acc_tick);
+            return this.packEtaResult(result.acc_tick, 0, result.brk_tick, spd, fc, try_count);
         } else {
             const t = this.maxspd_tick;
             const ct = (distance - this.maxspd_total_distance) / this.maxspd;
             const bt = this.calcBrakingTick(this.maxspd);
             const fc = this.calcFuelConsumed(t + ct);
-            return {
-                ttl_sec: this.tick2Seconds(t + bt + ct),
-                acc_sec: this.tick2Seconds(t),
-                cru_sec: this.tick2Seconds(ct),
-                brk_sec: this.tick2Seconds(bt),
-                maxspd: this.gameSpd2kmph(this.maxspd),
-                fuel_consumed_joule: fc,
-                fuel_consumed_rate: fc / this.fuel.fuel_value,
-                try_count:0
-            }
+            return this.packEtaResult(t, ct, bt, this.maxspd, fc, 0);
+        }
+    }
+
+    packEtaResult(acc_t, cru_t, brk_t, maxspd, fc, tc) {
+        return {
+            ttl_sec: this.tick2Seconds(acc_t + cru_t + brk_t),
+            acc_sec: this.tick2Seconds(acc_t),
+            cru_sec: this.tick2Seconds(cru_t),
+            brk_sec: this.tick2Seconds(brk_t),
+            maxspd: this.gameSpd2kmph(maxspd),
+            fuel_consumed_joule: fc,
+            fuel_consumed_rate: fc / this.fuel.fuel_value,
+            try_count: tc
         }
     }
 
@@ -249,7 +241,7 @@ export default class Train {
         const ad = this.calcAccelerationDistance(acc_tick)
         const bd = this.calcBrakingDistance(spd);
         const bt = this.calcBrakingTick(spd);
-        
+
         return { dis: ad + bd, acc_tick, brk_tick: bt };
     }
 

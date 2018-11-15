@@ -30,19 +30,21 @@ export default class ETACalcForm extends React.Component {
 
                 </p>
                 {!Number.isNaN(eta) ?
-                <dl>
-                    <dt>運行時間</dt>
-                    <dd>{eta.ttl_sec.toFixed(2)} 秒</dd>
-                    <dt>燃料消費(１車両あたり)</dt>
-                    <dd> 
-                        {(eta.fuel_consumed_joule / 1000).toFixed(2) + " KJ"}<br />
-                        <img src={"img/" + train.fuel.img} alt={train.fuel.name} width={20} height={20} />
-                                {eta.fuel_consumed_rate.toFixed(2)} 個分
-                    </dd>
-                </dl> : <span>X</span>
+                    <dl>
+                        <dt>運行時間</dt>
+                        <dd>{eta.ttl_sec.toFixed(2)} 秒</dd>
+                        <dt>燃料消費(１車両あたり)</dt>
+                        <dd>
+                            <span>{(eta.fuel_consumed_joule / 1000).toFixed(2) + " KJ"} (</span>
+                            <img src={"img/" + train.fuel.img} alt={train.fuel.name} width={20} height={20} />
+                            <span>{eta.fuel_consumed_rate.toFixed(2)} 個分) </span><br />
+                            <span>{(0.5 / eta.fuel_consumed_rate).toFixed(2)} 往復分</span>
+                        </dd>
+
+                    </dl> : <span>X</span>
                 }
-                
-                    
+                {false ? <span>{eta.try_count}</span> : null}
+
 
             </div>
         )
