@@ -1,4 +1,5 @@
 import defs from '../defines';
+import Spline from './spline';
 
 // Factorioの列車は動力による加速は現在の速度によらず一定で、空気抵抗は速度に比例して大きくなるようである。
 // 出発時から n tick目の速度を v(n)、加速を accとすると
@@ -32,6 +33,7 @@ export default class Train {
         this.airResistance = 0;
         this.limitSpeed = 0;        
 
+        this.spline = new Spline();
         this.graphData = null;
     }
 
@@ -103,6 +105,7 @@ export default class Train {
 
     buildGraphData() {
         const data = [];
+        const sparr = [];
         const datapoints = 20;
         // 加速中のデータ
         for (let i = 0; i < datapoints; i++) {
@@ -122,7 +125,9 @@ export default class Train {
                 brk_dis: bd,
                 maxspd: this.gameSpd2kmph(spd)
             }
+            sparr[i] = t + bt;
         }
+        this.spline.init(sparr);
 
         // 最高速度に到達後のデータ
         // 加速区間と減速区間は一定なので、最高速度での走行距離と時間を求めれば良い
