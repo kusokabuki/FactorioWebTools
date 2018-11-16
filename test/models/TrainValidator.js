@@ -1,7 +1,7 @@
 import React from 'react';
 import defs from '../defines';
 
-import Train from '../models/Train';
+import Train from './Train';
 
 export default class TrainValidatorApp extends React.component {
     constructor(props) {
