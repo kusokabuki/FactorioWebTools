@@ -16,3 +16,8 @@ npm install コマンドで-gオプションを使うとグローバル環境に
 ローカルインストールでこれらのコマンドを使うにはnode_modules/.bin/コマンド名 (/はバックスラッシュにすること)で実行するか、npm scriptsでコマンドを記述する。ここではローカルのコマンドもパスが通る。
 npm scriptsはpackage.jsonに記述し、npm run <スクリプト名>で呼び出せる。
 
+# npm＋babel+webpack
+## コンパイル
+> npm run webpack
+## デバッグ+監視モード
+> npm run watch

@@ -8,7 +8,7 @@ import ResultView from './ResultView.jsx';
 import GraphView from './GraphView.jsx';
 import ETACalcForm from './ETACalcForm.jsx';
 
-import Train from './Train';
+import Train from '../models/Train';
 
 export default class TrainApp extends React.Component {
     constructor(props) {

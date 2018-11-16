@@ -2,7 +2,7 @@ import React from 'react';
 
 export default (props) => {
     const train = props.train;
-    const r = train.MaxSpeedInfo;
+    const r = train.TopSpeedSummary;
     return (
         <div className="resultView">
             <h2>計算結果</h2>
@@ -13,14 +13,16 @@ export default (props) => {
                         <th>到達距離</th>
                         <th>到達時間</th>
                         <th>制動距離</th>
+                        <th>制動時間</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>                            
-                        <td>{r.spd.toFixed(4)} km/h</td>
-                        <td>{r.dis.toFixed(4)} m</td>
-                        <td>{r.sec.toFixed(4)} s</td>
-                        <td>{r.brk.toFixed(4)} m</td>
+                        <td>{r.top_spd.toFixed(4)} km/h</td>
+                        <td>{r.acc_dis.toFixed(4)} m</td>
+                        <td>{r.acc_sec.toFixed(4)} s</td>
+                        <td>{r.brk_dis.toFixed(4)} m</td>
+                        <td>{r.brk_sec.toFixed(4)} s</td>
                     </tr>
                 </tbody>
             </table>

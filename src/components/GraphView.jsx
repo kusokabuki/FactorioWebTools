@@ -77,7 +77,7 @@ const renderDistancebaseGraph = (props) => {
                 <Tooltip content={CustomTooltip}/>
                 <Area dataKey='acc_sec' stackId="1" name="加速区間" unit="秒" stroke='#8884d8' fill='#8884d8' />
                 <Area dataKey='brk_sec' stackId="1" name="減速区間" unit="秒" stroke='#ffc658' fill='#ffc658' />
-                <Area dataKey='cru_sec' stackId="1" name="巡航区間" unit="秒" stroke='#82ca9d' fill='#82ca9d' />
+                <Area dataKey='cru_sec' stackId="1" name="巡航区間" unit="秒" stroke='#82ca9d' fill='#82ca9d' />                
                 <ReferenceLine x={train.maxspd_total_distance}  stroke="red" />
             </AreaChart>
         </div>
