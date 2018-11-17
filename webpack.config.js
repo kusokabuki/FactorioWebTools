@@ -1,5 +1,4 @@
 var path = require("path");
-var webpack = require("webpack");
 
 module.exports = {
     mode: "production",
@@ -8,8 +7,8 @@ module.exports = {
         "test/app": "./test/test.jsx"
     },
     output: {
-        path: path.join(__dirname, 'docs'),
-        filename: '[name].bundle.js'
+        path: path.join(__dirname, "docs"),
+        filename: "[name].bundle.js"
     },
     module: {
         rules: [
@@ -24,9 +23,9 @@ module.exports = {
             {
                 test: /\.scss$/,
                 use:[
-                    'style-loader',
+                    "style-loader",
                     {
-                        loader: 'css-loader',
+                        loader: "css-loader",
                         options: {
                             url: false,
                             sourceMap: false,
@@ -34,7 +33,7 @@ module.exports = {
                         }
                     },
                     {
-                        loader: 'sass-loader',
+                        loader: "sass-loader",
                         options: {
                             sourceMap: false
                         }

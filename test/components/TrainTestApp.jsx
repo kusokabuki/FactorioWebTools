@@ -1,8 +1,8 @@
-import React from 'react';
-import defs from '../../src/defines';
-import TestSelectorForm from './TestSelectorForm.jsx';
-import DataView from './DataView.jsx';
-import TrainValidator from '../models/TrainValidator';
+import React from "react";
+import defs from "../../src/defines";
+import TestSelectorForm from "./TestSelectorForm.jsx";
+import DataView from "./DataView.jsx";
+import TrainValidator from "../models/TrainValidator";
 
 export default class TrainTestApp extends React.Component {
     constructor(props) {
@@ -10,7 +10,7 @@ export default class TrainTestApp extends React.Component {
         this.state = {
             selectedTest: 0,
             isLoaded: false
-        }
+        };
         this.validator = new TrainValidator();
         this.handleOnChange = this.handleOnChange.bind(this);
     }

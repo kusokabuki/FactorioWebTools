@@ -21,7 +21,7 @@ export default class TrainValidator {
             cargo_wagon: 3,
             artillery_wagon: 1,
             leader: 2
-        }
+        };
 
         const l1b1_state = {
             fuel: 3,
@@ -31,7 +31,7 @@ export default class TrainValidator {
             cargo_wagon: 0,
             artillery_wagon: 0,
             leader: 0
-        }
+        };
 
         return [
             {

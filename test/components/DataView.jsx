@@ -1,4 +1,3 @@
-import React from 'react';
 
 export default (props) => {
     const {data, isLoaded} = props;
@@ -13,5 +12,5 @@ export default (props) => {
                 </tbody>
             </table>
         </div>
-    )
-}
+    );
+};
