@@ -1,13 +1,18 @@
 import React from 'react';
-import defs from '../defines';
+import defs from '../../src/defines';
 
-import Train from './Train';
+import Train from '../../src/models/Train';
 
-export default class TrainValidatorApp extends React.component {
-    constructor(props) {
-        super(props);
+export default class TrainValidator {
+    constructor() {
 
         this.train = new Train();
+        this.tests = this.buildTests();
+        this.data = null;
+        this.currentTestIndex = 0;
+    }
+
+    buildTests() {
         const c1l2c2a1b1_state = {
             fuel: 3,
             braking_bonus: 1.00,
@@ -27,50 +32,67 @@ export default class TrainValidatorApp extends React.component {
             artillery_wagon: 0,
             leader: 0
         }
-        
-        this.tests =[
+
+        return [
             {
                 name: "various_50",
-                state:c1l2c2a1b1_state,
+                state: c1l2c2a1b1_state,
                 file: "data/c1l2c2a1b1/50.txt",
                 distance: 50
             },
             {
                 name: "various_100",
-                state:c1l2c2a1b1_state,
+                state: c1l2c2a1b1_state,
                 file: "data/c1l2c2a1b1/100.txt",
                 distance: 100
             },
             {
                 name: "various_550",
-                state:c1l2c2a1b1_state,
+                state: c1l2c2a1b1_state,
                 file: "data/c1l2c2a1b1/550.txt",
                 distance: 550
             },
             {
                 name: "uni_50",
-                state:l1b1_state,
+                state: l1b1_state,
                 file: "data/l1b1/50.txt",
                 distance: 50
             },
             {
                 name: "uni_100",
-                state:l1b1_state,
+                state: l1b1_state,
                 file: "data/l1b1/100.txt",
                 distance: 100
             },
             {
                 name: "uni_200",
-                state:l1b1_state,
+                state: l1b1_state,
                 file: "data/l1b1/200.txt",
                 distance: 200
             },
             {
                 name: "uni_1000",
-                state:l1b1_state,
+                state: l1b1_state,
                 file: "data/l1b1/1000.txt",
                 distance: 1000
             },
         ];
+    }
+
+    loadData(testIndex) {
+        this.currentTestIndex = testIndex;
+        const test = this.tests[testIndex];
+        this.train.setState(test.state);
+
+        return fetch("../" + test.file)
+            .then(res => res.text())
+            .then(text => {
+                console.log(text);
+                this.parseData(text);
+            });
+    }
+
+    parseData(text) {
+        this.data = ["dammy"];
     }
 }

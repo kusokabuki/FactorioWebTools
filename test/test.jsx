@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDom from 'react-dom';
+import TrainTestApp from './components/TrainTestApp.jsx';
+import './style.scss';
 
-import TrainValidator from './models/TrainValidator';
-
-ReactDom.render (<TrainValidatorApp />, document.getElementById("app"));
+ReactDom.render (<TrainTestApp />, document.getElementById("app"));

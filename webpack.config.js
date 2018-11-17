@@ -5,7 +5,7 @@ module.exports = {
     mode: "production",
     entry: {
         "app": "./src/main.jsx",
-        "test/app": "./src/test.jsx"
+        "test/app": "./test/test.jsx"
     },
     output: {
         path: path.join(__dirname, 'docs'),
