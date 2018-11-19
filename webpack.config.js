@@ -17,12 +17,21 @@ module.exports = {
                 loader: "babel-loader",
                 exclude: /node_modules/,
                 options: {
-                    presets: ["@babel/preset-env", "@babel/preset-react"]
+                    presets: [
+                        [
+                            "@babel/preset-env",
+                            {
+                                "targets": {
+                                    "node": "current"
+                                }
+                            }
+                        ],
+                        "@babel/preset-react"]
                 }
             },
             {
                 test: /\.scss$/,
-                use:[
+                use: [
                     "style-loader",
                     {
                         loader: "css-loader",

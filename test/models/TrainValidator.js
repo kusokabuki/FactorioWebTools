@@ -79,17 +79,16 @@ export default class TrainValidator {
         ];
     }
 
-    loadData(testIndex) {
+    async fetchData(testIndex) {
         this.currentTestIndex = testIndex;
         const test = this.tests[testIndex];
         this.train.setState(test.state);
 
-        return fetch("../" + test.file)
-            .then(res => res.text())
-            .then(text => {
-                console.log(text);
-                this.parseData(text);
-            });
+        const res = await fetch("../" + test.file);
+        const text = await res.text();
+        console.log(text);
+        this.parseData(text);
+        return this.data;
     }
 
     parseData(text) {

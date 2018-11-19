@@ -35,7 +35,7 @@ export default class TrainTestApp extends React.Component {
     }
 
     componentDidMount() {
-        this.validator.loadData(this.state.selectedTest)
+        this.validator.fetchData(this.state.selectedTest)
             .then(() =>{
                 this.setState({isLoaded:true});
             });

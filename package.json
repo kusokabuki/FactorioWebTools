@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/Meowhal/FactorioWebTools#readme",
   "dependencies": {
+    "express": "^4.16.4",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
     "recharts": "^1.3.5"
