@@ -1,5 +1,4 @@
 import React from "react";
-import defs from "../../src/defines";
 import TestSelectorForm from "./TestSelectorForm.jsx";
 import DataView from "./DataView.jsx";
 import TrainValidator from "../models/TrainValidator";
@@ -25,19 +24,24 @@ export default class TrainTestApp extends React.Component {
         return (
             <div>
                 <h1>train test app</h1>
-                <TestSelectorForm 
-                    tests={this.validator.tests} 
-                    selectedTest={this.state.selectedTest} 
+                <TestSelectorForm
+                    tests={this.validator.tests}
+                    selectedTest={this.state.selectedTest}
                     onChange={this.handleOnChange} />
-                <DataView isLoaded={this.state.isLoaded} data={this.validator.data} />
+                <DataView isLoaded={this.state.isLoaded} data={this.validator.data} header={this.validator.header} />
             </div>
         );
     }
 
-    componentDidMount() {
-        this.validator.fetchData(this.state.selectedTest)
-            .then(() =>{
-                this.setState({isLoaded:true});
-            });
+    async componentDidMount() {
+        await this.validator.fetchData(this.state.selectedTest);
+        this.setState({ isLoaded: true });
+    }
+
+    async componentDidUpdate(prevProps, prevState) {
+        if (this.state.selectedTest !== prevState.selectedTest) {
+            await this.validator.fetchData(this.state.selectedTest);
+            this.setState({ isLoaded: true });
+        }
     }
 }

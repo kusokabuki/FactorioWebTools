@@ -1,11 +1,7 @@
-import React from 'react';
-import defs from '../../src/defines';
-
 import Train from '../../src/models/Train';
 
 export default class TrainValidator {
     constructor() {
-
         this.train = new Train();
         this.tests = this.buildTests();
         this.data = null;
@@ -86,12 +82,20 @@ export default class TrainValidator {
 
         const res = await fetch("../" + test.file);
         const text = await res.text();
-        console.log(text);
-        this.parseData(text);
+        this.parseCSV(text);
         return this.data;
     }
 
-    parseData(text) {
-        this.data = ["dammy"];
+    parseCSV(text) {
+        this.data = [];
+        let lines = text.split(/\n\r?/);
+        const csvsplitter = /,\s*/;
+        this.header = lines[0].split(csvsplitter);
+        for (let i = 1; i < lines.length; i++) {
+            this.data.push(lines[i]
+                .split(csvsplitter)
+                .filter(v => v.length > 0)
+                .map(parseFloat));
+        }
     }
 }
