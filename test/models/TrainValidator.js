@@ -1,101 +1,113 @@
 import Train from '../../src/models/Train';
+import TestParams from "./TestParams";
 
 export default class TrainValidator {
     constructor() {
         this.train = new Train();
-        this.tests = this.buildTests();
-        this.data = null;
+        this.tests = TestParams;
+        this.testResult = null;
         this.currentTestIndex = 0;
-    }
-
-    buildTests() {
-        const c1l2c2a1b1_state = {
-            fuel: 3,
-            braking_bonus: 1.00,
-            locomotive_active: 2,
-            locomotive_inactive: 0,
-            cargo_wagon: 3,
-            artillery_wagon: 1,
-            leader: 2
-        };
-
-        const l1b1_state = {
-            fuel: 3,
-            braking_bonus: 1.00,
-            locomotive_active: 1,
-            locomotive_inactive: 0,
-            cargo_wagon: 0,
-            artillery_wagon: 0,
-            leader: 0
-        };
-
-        return [
-            {
-                name: "various_50",
-                state: c1l2c2a1b1_state,
-                file: "data/c1l2c2a1b1/50.txt",
-                distance: 50
-            },
-            {
-                name: "various_100",
-                state: c1l2c2a1b1_state,
-                file: "data/c1l2c2a1b1/100.txt",
-                distance: 100
-            },
-            {
-                name: "various_550",
-                state: c1l2c2a1b1_state,
-                file: "data/c1l2c2a1b1/550.txt",
-                distance: 550
-            },
-            {
-                name: "uni_50",
-                state: l1b1_state,
-                file: "data/l1b1/50.txt",
-                distance: 50
-            },
-            {
-                name: "uni_100",
-                state: l1b1_state,
-                file: "data/l1b1/100.txt",
-                distance: 100
-            },
-            {
-                name: "uni_200",
-                state: l1b1_state,
-                file: "data/l1b1/200.txt",
-                distance: 200
-            },
-            {
-                name: "uni_1000",
-                state: l1b1_state,
-                file: "data/l1b1/1000.txt",
-                distance: 1000
-            },
+        this.header = [
+            "tick",
+            "sim_speed",
+            "test_speed",
+            "dif_speed",
+            "sim_distance",
+            "test_distance",
+            "dif_distance",
         ];
     }
 
-    async fetchData(testIndex) {
+    async startTest(testIndex) {
         this.currentTestIndex = testIndex;
         const test = this.tests[testIndex];
         this.train.setState(test.state);
 
-        const res = await fetch("../" + test.file);
+        const testdata = await this.fetchData("../" + test.file);
+        const simdata = this.simulateTrain();
+
+        this.testResult = this.compareTestdataToSimulation(testdata, simdata);
+    }
+
+    async fetchData(filePath) {
+        const res = await fetch(filePath);
         const text = await res.text();
-        this.parseCSV(text);
-        return this.data;
+        return this.parseCSV(text);
     }
 
     parseCSV(text) {
-        this.data = [];
+        let data = [];
         let lines = text.split(/\n\r?/);
         const csvsplitter = /,\s*/;
-        this.header = lines[0].split(csvsplitter);
+        const header = lines[0].split(csvsplitter);
         for (let i = 1; i < lines.length; i++) {
-            this.data.push(lines[i]
-                .split(csvsplitter)
-                .filter(v => v.length > 0)
-                .map(parseFloat));
+            if (0 < lines[i].length) {
+                const vals = lines[i]
+                    .split(csvsplitter)
+                    .map(parseFloat);
+                let d = {};
+                for (let j = 0; j < vals.length; j++) {
+                    d[header[j]] = vals[j];
+                }
+                data.push(d);
+            }
+
         }
+        return data;
     }
+
+    simulateTrain() {
+        const test = this.tests[this.currentTestIndex];
+        const eta = this.train.calcEta(test.distance);
+        const result = [{
+            tick: 0,
+            speed: 0,
+            distance: 0
+        }];
+        let ttl_d = 0;
+        let spd = 0;
+        for (let t = 0; t < eta.ttl_tick; t++) {
+            if (t <= eta.acc_tick) {
+                spd = this.train.calcSpeed(t);
+            } else if (eta.acc_tick + eta.cru_tick < t) {
+                spd -= this.train.ba;
+            }
+            ttl_d += spd;
+            result[t + 1] = {
+                tick: t + 1,
+                speed: spd,
+                distance: ttl_d
+            }
+        }
+        return result;
+    }
+
+    compareTestdataToSimulation(testdata, simdata) {
+        const size = Math.max(simdata.length, testdata.length);
+        const result = [];
+
+        for (let i = 0; i < size; i++) {
+            const r = { tick: i };
+            if (i < simdata.length) {
+                r.sim_speed = simdata[i].speed;
+                r.sim_distance = simdata[i].distance;
+            } else {
+                r.sim_speed = 0;
+                r.sim_distance = 0;
+            }
+
+            if (i < testdata.length) {
+                r.test_speed = testdata[i].speed;
+                r.test_distance = testdata[i].distance;
+            } else {
+                r.test_speed = 0;
+                r.test_distance = 0;
+            }
+            r.dif_speed = r.sim_speed - r.test_speed;
+            r.dif_distance = r.sim_distance - r.test_distance;
+            result[i] = r;
+        }
+        return result;
+    }
+
 }

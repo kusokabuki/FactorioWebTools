@@ -28,19 +28,22 @@ export default class TrainTestApp extends React.Component {
                     tests={this.validator.tests}
                     selectedTest={this.state.selectedTest}
                     onChange={this.handleOnChange} />
-                <DataView isLoaded={this.state.isLoaded} data={this.validator.data} header={this.validator.header} />
+                <DataView
+                    isLoaded={this.state.isLoaded}
+                    data={this.validator.testResult}
+                    header={this.validator.header} />
             </div>
         );
     }
 
     async componentDidMount() {
-        await this.validator.fetchData(this.state.selectedTest);
+        await this.validator.startTest(this.state.selectedTest);
         this.setState({ isLoaded: true });
     }
 
     async componentDidUpdate(prevProps, prevState) {
         if (this.state.selectedTest !== prevState.selectedTest) {
-            await this.validator.fetchData(this.state.selectedTest);
+            await this.validator.startTest(this.state.selectedTest);
             this.setState({ isLoaded: true });
         }
     }

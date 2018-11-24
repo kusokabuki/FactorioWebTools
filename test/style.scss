@@ -13,6 +13,46 @@ body {
     color: #20262E;
 }
 
+@mixin cell-style () {
+    border: 1px solid gray;
+    padding: 5px;
+}
+
 .component {
     margin: 10px;
+
+    &.dataView {
+        table {
+            border-collapse: collapse;
+        }
+        th {
+            @include cell-style();
+
+        }
+        td {
+            @include cell-style();
+            text-align: right;
+        }
+
+        .sim {
+            background-color: #ffefef;
+        }
+
+        .test {
+            background-color: #efffef;
+        }
+
+        .dif {
+            background-color: #efefff;
+        }
+
+        .perr {
+            color: blue;
+        }
+
+        .nerr {
+            color: red;
+        }
+    }
 }
+

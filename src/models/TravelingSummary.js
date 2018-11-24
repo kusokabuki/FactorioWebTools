@@ -36,8 +36,12 @@ export default class TravelingSummary {
         return this.tick2Seconds(this.brk_tick);
     }
 
+    get ttl_tick() {
+        return this.acc_tick + this.cru_tick + this.brk_tick;
+    }
+
     get ttl_sec() {
-        return this.tick2Seconds(this.acc_tick + this.cru_tick + this.brk_tick);
+        return this.tick2Seconds(this.ttl_tick);
     }
 
     get ttl_dis() {

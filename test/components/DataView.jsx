@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CsvTable = (props) => {
+const ObjectTable = (props) => {
     const { data, header } = props;
     return (
         <table>
@@ -12,8 +12,14 @@ const CsvTable = (props) => {
             <tbody>
                 {data.map((r, i) =>
                     <tr key={"tr" + i}>
-                        {r.map((d, j) =>
-                            <td key={"td" + j}>{d}</td>
+                        {header.map((h, j) =>{
+                            let cls  = h.split("_")[0];
+                            if (cls == "dif") {
+                                cls += r[h] > 0 ? " perr" : " nerr";
+                            }
+                            return <td className={cls} key={"td" + j}>{r[h].toFixed(5)}</td>
+                        }
+                            
                         )}
                     </tr>
                 )}
@@ -27,7 +33,7 @@ export default (props) => {
     return (
         <div className="component dataView">
             <h2>データビュー</h2>
-            {isLoaded ? <CsvTable data={data} header={header} /> : <span>読み込み中</span>}
+            {isLoaded ? <ObjectTable data={data} header={header} /> : <span>読み込み中</span>}
         </div>
     );
 };
