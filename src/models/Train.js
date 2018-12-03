@@ -128,7 +128,7 @@ export default class Train {
     // 距離distanceの運行時間を計算する
     calcEta(distance) {
         this.eta_trycount = 0;
-        if (Number.isNaN(distance) || distance < 0) {
+        if (Number.isNaN(distance) || distance <= 0) {
             return NaN;
         } else if (distance < this.maxspd_total_distance) {
             let left = 0;
