@@ -9,12 +9,15 @@ export default class TrainValidator {
         this.currentTestIndex = 0;
         this.header = [
             "tick",
+            "acc_tick",
             "sim_speed",
             "test_speed",
             "dif_speed",
             "sim_distance",
             "test_distance",
+            "acc_dis",
             "dif_distance",
+            
         ];
     }
 
@@ -62,21 +65,30 @@ export default class TrainValidator {
         const result = [{
             tick: 0,
             speed: 0,
-            distance: 0
+            distance: 0,
+            acc_tick: 0,
+            acc_dis: 0,
         }];
-        let ttl_d = 0;
-        let spd = 0;
+        let distance = 0;
+        let speed = 0;
+        
         for (let t = 0; t < eta.ttl_tick; t++) {
+            let acc_tick = null;
+            let acc_dis = null;
             if (t <= eta.acc_tick) {
-                spd = this.train.calcSpeed(t);
+                speed = this.train.calcSpeed(t);
+                acc_tick = this.train.calcAccelerationTick(speed);
+                acc_dis = this.train.calcAccelerationDistance(t + 1);
             } else if (eta.acc_tick + eta.cru_tick < t) {
-                spd -= this.train.ba;
+                speed -= this.train.acc_brake;
             }
-            ttl_d += spd;
+            distance += speed;
             result[t + 1] = {
                 tick: t + 1,
-                speed: spd,
-                distance: ttl_d
+                speed,
+                distance,
+                acc_tick,
+                acc_dis,
             }
         }
         return result;
@@ -91,6 +103,8 @@ export default class TrainValidator {
             if (i < simdata.length) {
                 r.sim_speed = simdata[i].speed;
                 r.sim_distance = simdata[i].distance;
+                r.acc_tick = simdata[i].acc_tick;
+                r.acc_dis = simdata[i].acc_dis;
             } else {
                 r.sim_speed = 0;
                 r.sim_distance = 0;
@@ -105,6 +119,7 @@ export default class TrainValidator {
             }
             r.dif_speed = r.sim_speed - r.test_speed;
             r.dif_distance = r.sim_distance - r.test_distance;
+            
             result[i] = r;
         }
         return result;

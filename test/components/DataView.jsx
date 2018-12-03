@@ -17,7 +17,7 @@ const ObjectTable = (props) => {
                             if (cls == "dif") {
                                 cls += r[h] > 0 ? " perr" : " nerr";
                             }
-                            return <td className={cls} key={"td" + j}>{r[h].toFixed(5)}</td>
+                            return <td className={cls} key={"td" + j}>{Number.isFinite(r[h]) ? r[h].toFixed(5) : "-"}</td>
                         }
                             
                         )}

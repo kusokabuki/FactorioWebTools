@@ -1,27 +1,19 @@
 
+import defs from '../defines';
+
 /**
  * 列車の運行概要を表すクラス
  * 加速区間、巡航区間、減速区間のそれぞれの所要時間、走行距離を保持する
  */
 export default class TravelingSummary {
-    constructor(train, acc_tick) {
-        if (train.maxspd_tick <= acc_tick) {
-            this.acc_tick = train.maxspd_tick;
-            this.acc_dis = train.maxspd_distance;
-            this.cru_tick = acc_tick - train.maxspd_tick;
-            this.cru_dis = train.maxspd * this.cru_tick;
-            this.topSpeed = train.maxspd;
-        } else {
-            this.acc_tick = acc_tick;
-            this.acc_dis = train.calcAccelerationDistance(acc_tick);
-            this.cru_tick = 0;
-            this.cru_dis = 0;
-            this.topSpeed = train.calcSpeed(acc_tick);
-        }
-
-        this.brk_tick = train.calcBrakingTick(this.topSpeed);
-        this.brk_dis = train.calcBrakingDistance(this.topSpeed);
-        this.train = train;
+    constructor() {
+        this.acc_tick = 0;
+        this.acc_dis = 0;
+        this.cru_tick = 0;
+        this.cru_dis = 0;
+        this.topSpeed = 0;
+        this.brk_tick = 0;
+        this.brk_dis = 0;
     }
 
     get acc_sec() {
@@ -53,11 +45,7 @@ export default class TravelingSummary {
     }
 
     get fuel_consumed_joule() {
-        return this.train.calcFuelConsumed(this.acc_tick + this.cru_tick);
-    }
-
-    get fuel_consumed_rate() {
-        return this.fuel_consumed_joule / this.train.fuel.fuel_value;
+        return (this.acc_tick + this.cru_tick) * defs.locomotive_power_watt / 60;
     }
 
     tick2Seconds(tick) {

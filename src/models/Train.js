@@ -33,16 +33,13 @@ export default class Train {
         this.airResistance = 0;
         this.limitSpeed = 0;
 
+        this.topSpeed_summary = null; // 最高速度時のデータ
         this.graphData = null;
         this.graphAccDataPoints = 20;
     }
 
     get CanMove() {
         return this.power > this.friction;
-    }
-
-    get TopSpeedSummary() {
-        return new TravelingSummary(this, this.maxspd_tick);
     }
 
     get GraphData() {
@@ -73,66 +70,121 @@ export default class Train {
 
         this.power *= this.fuel.acc_mult;
         this.braking *= (state.braking_bonus + 1);
+        this.acc_brake = (this.braking + this.friction) / this.weight;
         this.airResistance = defs.vehicles[this.leader].air_resistance;
         this.limitSpeed = 1.2 * this.fuel.top_speed_mult;
+        this.graphData = null;
         this.update();
     }
 
     update() {
+        // 動力、摩擦、空気抵抗が影響する区間の計算に必要なパラメータの用意
         this.p = (1 - this.airResistance / this.weight * 1000);
-        this.v1 = this.power / this.weight * this.p;
-        this.q = this.v1 - this.friction / this.weight * this.p;
+        this.q = (this.power - this.friction) / this.weight * this.p;
         this.a = this.q / (1 - this.p);
-        this.ba = (this.braking + this.friction) / this.weight;
 
-        // 時速の小数点２桁までで表示されない大きさの数値
-        const err = 0.001 * 1000 / 60 / 60 / 60;
+        this.v1 = this.calcInitialSpeed();
 
         // 特性方程式の解(a)は到達可能な最高速度　a をそのまま使うとｎが求まらないので少し小さい値にする
-        this.maxspd = Math.min(this.a - err, this.limitSpeed);
-        this.maxspd_tick = this.calcAccelerationTick(this.maxspd);
-        this.maxspd_distance = this.calcAccelerationDistance(this.maxspd_tick);
-        this.maxspd_braking_distance = this.calcBrakingDistance(this.maxspd);
-        this.maxspd_total_distance = this.maxspd_distance + this.maxspd_braking_distance;
+        // 時速の小数点２桁までで表示されない大きさの数値
+        const err = 0.001 * 1000 / 60 / 60 / 60;
+        this.topSpeed = Math.min(this.a - err, this.limitSpeed);
+        this.topSpeed_tick = this.calcAccelerationTick(this.topSpeed);
+        this.topSpeed_summary = this.makeSummary(this.topSpeed_tick);
+    }
 
-        this.graphData = null;
+    // 初速
+    // エンジン加速より摩擦減速が先に計算されているっぽくて、１回目は摩擦なし
+    // 発射時のみ２回分の加速？
+    calcInitialSpeed() {
+        const acc_engine = this.power / this.weight;
+        const acc_friction = -this.friction / this.weight;
+        let speed = acc_engine * this.p;
+        speed = (speed + acc_engine + acc_friction) * this.p; 
+        return speed;
+    }
+
+    // 停止状態から速度spdに到達するまでのtick数を計算する
+    // 制限速度は考慮されない
+    calcAccelerationTick(spd) {
+        if (this.p === 1) { // 摩擦なしの場合
+            return Math.ceil((spd - this.v1) / this.q);
+        } else {
+            return Math.ceil(Math.log((spd - this.a) * this.p / (this.v1 - this.a)) / Math.log(this.p));    
+        }
+    }
+
+    // 停止状態から n tick 間加速し続けた場合の移動距離を計算する
+    // 制限速度は考慮されない
+    calcAccelerationDistance(tick) {
+        if (this.p === 1) {
+            return tick * this.calcSpeed(tick) / 2;
+        } else {
+            return (this.v1 - this.a) * (Math.pow(this.p, tick) - 1) / (this.p - 1) + tick * this.a;
+        }
+    }
+
+    // 停止状態から n tick 間加速し続けた場合の速度
+    calcSpeed(tick) {
+        if (this.topSpeed_tick <= tick) {
+            return this.topSpeed;
+        }
+
+        if (this.p === 1) {
+            return Math.min(this.q * tick, this.limitSpeed) + this.v1;
+        } else {
+            return Math.min((this.v1 - this.a) * Math.pow(this.p, tick) + this.a, this.limitSpeed);
+        }
+        
+    }
+
+    // 速度spd から停止までの移動距離を計算する
+    calcBrakingDistance(spd) {
+        return Math.max(spd / this.acc_brake / 2, 1.1) * spd;
+    }
+
+    // 速度spd から停止までのtick数を計算する
+    calcBrakingTick(spd) {
+        return Math.ceil(spd / this.acc_brake);
     }
 
     buildGraphData() {
         const data = [];
         const dps = this.graphAccDataPoints;
+        const ttl_dis = this.topSpeed_summary.ttl_dis;
 
         // 加速中のデータ
         for (let i = 0; i < dps; i++) {
-            const t = Math.floor((i + 1) * (this.maxspd_tick / dps));
-            data[i] = new TravelingSummary(this, t);
+            const t = Math.floor((i + 1) * (this.topSpeed_tick / dps));
+            data[i] = this.makeSummary(t);
         }
 
         // 最高速度に到達後のデータ
         // 加速区間と減速区間は一定なので、最高速度での走行距離と時間を求めれば良い
         const step = 50;
-        const limit = Math.min(this.maxspd_total_distance * 3, 5000);
-        const start = Math.ceil(this.maxspd_total_distance / step) * step;
+        const limit = Math.min(ttl_dis * 3, 5000);
+        const start = Math.ceil(ttl_dis / step) * step;
         const template = data[data.length - 1];
 
         for (let j = start; j < limit; j += step) {
             const nb = Object.create(template);
-            nb.cru_dis = (j - this.maxspd_total_distance);
-            nb.cru_tick = Math.ceil(nb.cru_dis / this.maxspd);
+            nb.cru_dis = (j - ttl_dis);
+            nb.cru_tick = Math.ceil(nb.cru_dis / this.topSpeed);
             data.push(nb);
         }
 
         return data;
-    }
+    }   
 
     // 距離distanceの運行時間を計算する
     calcEta(distance) {
+        const ttl_dis = this.topSpeed_summary.ttl_dis;
         this.eta_trycount = 0;
         if (Number.isNaN(distance) || distance <= 0) {
-            return NaN;
-        } else if (distance < this.maxspd_total_distance) {
+            return null;
+        } else if (distance < ttl_dis) {
             let left = 0;
-            let right = this.maxspd_tick;
+            let right = this.topSpeed_tick;
 
             // グラフ用のデータを流用して大体の位置を決める
             if (this.graphData !== null) {
@@ -152,10 +204,10 @@ export default class Train {
             while (left <= right) {
                 this.eta_trycount++;
                 let mid = Math.floor((left + right) / 2);
-                let v = new TravelingSummary(this, mid);
-                let v2 = new TravelingSummary(this, mid + 1);
+                let v1 = this.makeSummary(mid);
+                let v2 = this.makeSummary(mid + 1);
 
-                if (v.ttl_dis < distance && distance <= v2.ttl_dis) {
+                if (v1.ttl_dis < distance && distance <= v2.ttl_dis) {
                     result = v2;
                     break;
                 }
@@ -168,48 +220,33 @@ export default class Train {
             }
             return result;
         } else {
-            const ct = Math.ceil((distance - this.maxspd_total_distance) / this.maxspd);
-            return new TravelingSummary(this, this.maxspd_tick + ct);
+            const ct = Math.ceil((distance - ttl_dis) / this.topSpeed);
+            return this.makeSummary(this.topSpeed_tick + ct);
         }
     }
 
-    tick2Seconds(tick) {
-        return tick / 60;
+    makeSummary(acc_tick) {
+        const sum = new TravelingSummary();
+        if (this.topSpeed_tick <= acc_tick) {
+            sum.acc_tick = this.topSpeed_tick;
+            sum.acc_dis = this.calcAccelerationDistance(acc_tick);
+            sum.cru_tick = acc_tick - this.topSpeed_tick;
+            sum.cru_dis = this.topSpeed * sum.cru_tick;
+            sum.topSpeed = this.topSpeed;
+        } else {
+            sum.acc_tick = acc_tick;
+            sum.acc_dis = this.calcAccelerationDistance(acc_tick);
+            sum.cru_tick = 0;
+            sum.cru_dis = 0;
+            sum.topSpeed = this.calcSpeed(acc_tick);
+        }
+
+        sum.brk_tick = this.calcBrakingTick(sum.topSpeed);
+        sum.brk_dis = this.calcBrakingDistance(sum.topSpeed);
+        return sum;
     }
 
     gameSpd2kmph(spd) {
         return spd * 60 * 60 * 60 / 1000;
-    }
-
-    // 停止状態から速度spdに到達するまでのtick数を計算する
-    // 制限速度は考慮されない
-    calcAccelerationTick(spd) {
-        return Math.ceil(Math.log((spd - this.a) * this.p / (this.v1 - this.a)) / Math.log(this.p));
-    }
-
-    // 停止状態から n tick 間加速し続けた場合の移動距離を計算する
-    // 制限速度は考慮されない
-    calcAccelerationDistance(tick) {
-        return (this.v1 - this.a) * (Math.pow(this.p, tick) - 1) / (this.p - 1) + tick * this.a;
-    }
-
-    // 速度spd から停止までの移動距離を計算する
-    calcBrakingDistance(spd) {
-        return Math.max(spd / this.ba / 2, 1.1) * spd;
-    }
-
-    // 速度spd から停止までのtick数を計算する
-    calcBrakingTick(spd) {
-        return Math.ceil(spd / this.ba);
-    }
-
-    // 停止状態から n tick 間加速し続けた場合の速度
-    calcSpeed(tick) {
-        return Math.min((this.v1 - this.a) * Math.pow(this.p, (tick - 1)) + this.a, this.limitSpeed);
-    }
-
-    // エンジン稼働時間から燃料消費量を求める
-    calcFuelConsumed(tick) {
-        return defs.locomotive_power_watt * tick / 60;
     }
 }

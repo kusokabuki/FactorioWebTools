@@ -2,7 +2,8 @@ import React from 'react';
 
 export default (props) => {
     const train = props.train;
-    const r = train.TopSpeedSummary;
+    const r = train.topSpeed_summary;
+    if (r == null) return null;
     return (
         <div className="resultView">
             <h2>計算結果</h2>
